@@ -1,7 +1,10 @@
 package com.example.opensky.model;
 
+import android.app.Application;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -9,10 +12,14 @@ import com.example.opensky.OpenSkyStates;
 import com.example.opensky.apiclient.APIClient;
 import com.example.opensky.apiclient.apiinterface.OpenSkyService;
 import com.example.opensky.apiclient.apiinterface.OpenWeatherMapService;
-import com.example.opensky.model.Location;
+import com.example.opensky.database.AppDatabase;
+import com.example.opensky.database.PlaneDao;
+import com.example.opensky.database.Plane;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,11 +31,21 @@ public class PlaneViewModel extends ViewModel {
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private OpenSkyService openSkyService;
     private OpenWeatherMapService openWeatherMapService;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final Application application;
+    private MediatorLiveData<List<Plane>> savedPlanes = new MediatorLiveData<>();
+    private PlaneDao planeDao;
 
-    public PlaneViewModel() {
+
+    public PlaneViewModel(Application application) {
+        this.application = application;
         openSkyService = APIClient.getOpenSkyClient().create(OpenSkyService.class);
         openWeatherMapService = APIClient.getOpenWeatherMapClient().create(OpenWeatherMapService.class);
+        AppDatabase appDatabase = AppDatabase.getDatabase(application);
+        planeDao = appDatabase.planeDao();
+        savedPlanes.addSource(planeDao.getAllPlanes(), planes -> savedPlanes.setValue(planes));
     }
+
 
     public MutableLiveData<List<StateVector>> getPlanes() {
         return planes;
@@ -94,6 +111,33 @@ public class PlaneViewModel extends ViewModel {
             }
         });
     }
+
+    public void addToDatabase(StateVector stateVector) {
+        executorService.execute(() -> {
+            PlaneDao dao = AppDatabase.getDatabase(application).planeDao();
+
+            Plane plane = new Plane(stateVector.getIcao24(), stateVector.getCallsign());
+            dao.insert(plane);
+        });
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        executorService.shutdown();
+    }
+
+    public LiveData<List<Plane>> getSavedPlanes() {
+        return savedPlanes;
+    }
+
+    public void loadSavedPlanes() {
+        PlaneDao dao = AppDatabase.getDatabase(application).planeDao();
+        LiveData<List<Plane>> roomLiveData = dao.getAllPlanes();
+
+        savedPlanes.addSource(roomLiveData, planes -> savedPlanes.setValue(planes));
+    }
+
 
 
 }
