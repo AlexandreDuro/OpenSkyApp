@@ -5,17 +5,20 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-    private static final String BASE_URL = "https://opensky-network.org/api/";
+    private static final String OPENSKY_BASE_URL = "https://opensky-network.org/api/";
+    private static final String OPENWEATHERMAP_BASE_URL = "https://api.openweathermap.org/";
 
-    private static Retrofit retrofit = null;
-
-    public static Retrofit getClient() {
-
-        retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+    public static Retrofit getOpenSkyClient() {
+        return new Retrofit.Builder()
+                .baseUrl(OPENSKY_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+    }
 
-        return retrofit;
+    public static Retrofit getOpenWeatherMapClient() {
+        return new Retrofit.Builder()
+                .baseUrl(OPENWEATHERMAP_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
     }
 }

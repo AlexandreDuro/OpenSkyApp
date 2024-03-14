@@ -43,6 +43,7 @@ public class PlaneAdapter extends RecyclerView.Adapter<PlaneAdapter.PlaneViewHol
         StateVector currentItem = mPlaneList.get(position);
         holder.textViewIcao24.setText(currentItem.getIcao24());
         holder.textViewCallsign.setText(currentItem.getCallsign());
+
     }
 
     @Override
