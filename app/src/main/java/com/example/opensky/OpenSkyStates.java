@@ -1,17 +1,10 @@
 package com.example.opensky;
 
-import com.example.opensky.model.StateVector;
-
 import java.util.List;
 
 public class OpenSkyStates {
     private int time;
-    private List<StateVector> states;
-
-    public OpenSkyStates(int time, List<StateVector> states) {
-        this.time = time;
-        this.states = states;
-    }
+    private List<List<Object>> states;
 
     public int getTime() {
         return time;
@@ -21,11 +14,11 @@ public class OpenSkyStates {
         this.time = time;
     }
 
-    public List<StateVector> getStates() {
+    public List<List<Object>> getStates() {
         return states;
     }
 
-    public void setStates(List<StateVector> states) {
+    public void setStates(List<List<Object>> states) {
         this.states = states;
     }
 }

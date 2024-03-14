@@ -1,5 +1,8 @@
 package com.example.opensky;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,12 +29,18 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(planeAdapter);
 
         planeViewModel = new ViewModelProvider(this).get(PlaneViewModel.class);
-
         planeViewModel.getPlanes().observe(this, planes -> {
             planeAdapter.setPlaneList(planes);
         });
 
-        planeViewModel.loadPlanes();
+        Button btnLoadPlanes = findViewById(R.id.btnLoadPlanes);
+        btnLoadPlanes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                planeViewModel.loadPlanes();
+            }
+        });
 
     }
 }
+

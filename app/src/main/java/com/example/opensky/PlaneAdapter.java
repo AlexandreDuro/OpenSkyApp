@@ -9,11 +9,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.opensky.model.StateVector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaneAdapter extends RecyclerView.Adapter<PlaneAdapter.PlaneViewHolder> {
 
-    private List<StateVector> mPlaneList;
+    private List<StateVector> mPlaneList = new ArrayList<>();
 
     public static class PlaneViewHolder extends RecyclerView.ViewHolder {
         public TextView textViewIcao24;
@@ -50,7 +51,11 @@ public class PlaneAdapter extends RecyclerView.Adapter<PlaneAdapter.PlaneViewHol
     }
 
     public void setPlaneList(List<StateVector> planeList) {
-        mPlaneList = planeList;
+        if (planeList != null) {
+            mPlaneList = planeList;
+        } else {
+            mPlaneList = new ArrayList<>();
+        }
         notifyDataSetChanged();
     }
 }

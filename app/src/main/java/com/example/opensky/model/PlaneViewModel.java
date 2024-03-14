@@ -7,6 +7,7 @@ import com.example.opensky.OpenSkyStates;
 import com.example.opensky.apiclient.APIClient;
 import com.example.opensky.apiclient.apiinterface.OpenSkyService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -16,6 +17,7 @@ import retrofit2.Response;
 public class PlaneViewModel extends ViewModel {
 
     private MutableLiveData<List<StateVector>> planes = new MutableLiveData<>();
+    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private OpenSkyService openSkyService;
 
     public PlaneViewModel() {
@@ -36,15 +38,23 @@ public class PlaneViewModel extends ViewModel {
             @Override
             public void onResponse(Call<OpenSkyStates> call, Response<OpenSkyStates> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    planes.postValue(response.body().getStates());
+                    List<StateVector> stateVectors = new ArrayList<>();
+                    for (List<Object> state : response.body().getStates()) {
+                        String icao24 = (String) state.get(0);
+                        String callsign = (String) state.get(1);
+                        stateVectors.add(new StateVector(icao24, callsign.trim()));
+                    }
+                    planes.postValue(stateVectors);
                 } else {
-
+                    errorMessage.postValue("Failed to load data: HTTP error code " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<OpenSkyStates> call, Throwable t) {
+                errorMessage.postValue("Failed to load data: " + t.getMessage());
             }
         });
     }
+
 }
