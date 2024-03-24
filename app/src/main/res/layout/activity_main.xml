@@ -10,7 +10,7 @@
         android:id="@+id/airportEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Enter Airport Code or Name"
+        android:hint="Enter Airport Name (ex: Biarritz)"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/searchButton"
