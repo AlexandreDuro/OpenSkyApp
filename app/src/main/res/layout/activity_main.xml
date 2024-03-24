@@ -4,47 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1F2329"
     tools:context=".MainActivity">
 
     <EditText
         android:id="@+id/airportEditText"
-        android:layout_width="0dp"
+        style="@android:style/Widget.Holo.AutoCompleteTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:hint="Enter Airport Name (ex: Biarritz)"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:minHeight="48dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/white"
+        android:textColorHint="#A6A6A6"
         app:layout_constraintEnd_toStartOf="@+id/searchButton"
         app:layout_constraintHorizontal_chainStyle="packed"
-        android:layout_margin="16dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/searchButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Search"
+        android:textColor="@color/white"
+        app:icon="@drawable/logo"
+        app:iconTint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="@+id/airportEditText"
-        app:layout_constraintStart_toEndOf="@+id/airportEditText"
-        app:layout_constraintTop_toTopOf="@+id/airportEditText"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="8dp"/>
+        app:layout_constraintStart_toEndOf="@+id/airportEditText"
+        app:layout_constraintTop_toTopOf="@+id/airportEditText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/airportEditText"
+        android:layout_marginTop="16dp"
+        android:background="#343A45"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/airportEditText"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/view_saved_planes_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:text="View Saved Planes"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
