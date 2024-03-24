@@ -13,8 +13,8 @@ import com.example.opensky.apiclient.APIClient;
 import com.example.opensky.apiclient.apiinterface.OpenSkyService;
 import com.example.opensky.apiclient.apiinterface.OpenWeatherMapService;
 import com.example.opensky.database.AppDatabase;
-import com.example.opensky.database.PlaneDao;
 import com.example.opensky.database.Plane;
+import com.example.opensky.database.PlaneDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,28 +27,25 @@ import retrofit2.Response;
 
 public class PlaneViewModel extends ViewModel {
 
-    private MutableLiveData<List<StateVector>> planes = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private OpenSkyService openSkyService;
-    private OpenWeatherMapService openWeatherMapService;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final Application application;
-    private MediatorLiveData<List<Plane>> savedPlanes = new MediatorLiveData<>();
-    private PlaneDao planeDao;
-
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final OpenSkyService openSkyService;
+    private final OpenWeatherMapService openWeatherMapService;
+    private final MediatorLiveData<List<Plane>> savedPlanes = new MediatorLiveData<>();
+    private final MutableLiveData<List<Plane>> planesLiveData = new MutableLiveData<>();
+    private final PlaneDao planeDao;
 
     public PlaneViewModel(Application application) {
-        this.application = application;
         openSkyService = APIClient.getOpenSkyClient().create(OpenSkyService.class);
         openWeatherMapService = APIClient.getOpenWeatherMapClient().create(OpenWeatherMapService.class);
         AppDatabase appDatabase = AppDatabase.getDatabase(application);
         planeDao = appDatabase.planeDao();
-        savedPlanes.addSource(planeDao.getAllPlanes(), planes -> savedPlanes.setValue(planes));
+        savedPlanes.addSource(planeDao.getAllPlanes(), savedPlanes::setValue);
+        savedPlanes.addSource(planesLiveData, savedPlanes::setValue);
     }
 
-
-    public MutableLiveData<List<StateVector>> getPlanes() {
-        return planes;
+    public MutableLiveData<String> getErrorMessage() {
+        return errorMessage;
     }
 
     public void loadAirportCoordinates(String airportName) {
@@ -83,20 +80,26 @@ public class PlaneViewModel extends ViewModel {
         double latMax = lat + radius;
         double lonMax = lon + radius;
 
+        Log.d("PlaneViewModel", "loadPlanes: Loading planes...");
+
         openSkyService.getAllStates(latMin, lonMin, latMax, lonMax).enqueue(new Callback<OpenSkyStates>() {
             @Override
             public void onResponse(Call<OpenSkyStates> call, Response<OpenSkyStates> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     OpenSkyStates states = response.body();
                     if (states.getStates() != null) {
-                        List<StateVector> stateVectors = new ArrayList<>();
+                        List<Plane> planes = new ArrayList<>();
                         for (List<Object> state : states.getStates()) {
                             String icao24 = (String) state.get(0);
                             String callsign = state.size() > 1 ? (String) state.get(1) : "";
-                            stateVectors.add(new StateVector(icao24, callsign.trim()));
-                            Log.d("PlaneViewModel", "onResponse: " + icao24 + " " + callsign);
+                            String originCountry = state.size() > 2 ? (String) state.get(2) : "";
+                            float velocity = state.size() > 9 ? ((Number) state.get(9)).floatValue() : 0;
+                            float altitude = state.size() > 13 ? ((Number) state.get(13)).floatValue() : 0;
+                            planes.add(new Plane(icao24, callsign.trim(), originCountry, velocity, altitude));
+                            Log.d("PlaneViewModel", "loadPlanes: Plane added - ICAO24: " + icao24 + ", Callsign: " + callsign);
                         }
-                        planes.postValue(stateVectors);
+                        planesLiveData.postValue(planes);
+                        Log.d("PlaneViewModel", "loadPlanes: " + planes.size() + " planes loaded");
                     } else {
                         errorMessage.postValue("No states available");
                     }
@@ -112,13 +115,17 @@ public class PlaneViewModel extends ViewModel {
         });
     }
 
-    public void addToDatabase(StateVector stateVector) {
-        executorService.execute(() -> {
-            PlaneDao dao = AppDatabase.getDatabase(application).planeDao();
 
-            Plane plane = new Plane(stateVector.getIcao24(), stateVector.getCallsign());
-            dao.insert(plane);
-        });
+    public LiveData<List<Plane>> getSavedPlanes() {
+        return savedPlanes;
+    }
+
+    public LiveData<List<Plane>> getPlanes() {
+        return planeDao.getAllPlanes();
+    }
+
+    public LiveData<List<Plane>> getPlanesLiveData() {
+        return planesLiveData;
     }
 
     @Override
@@ -127,17 +134,15 @@ public class PlaneViewModel extends ViewModel {
         executorService.shutdown();
     }
 
-    public LiveData<List<Plane>> getSavedPlanes() {
-        return savedPlanes;
+    public void resetPlanes() {
+        savedPlanes.setValue(new ArrayList<>());
     }
 
-    public void loadSavedPlanes() {
-        PlaneDao dao = AppDatabase.getDatabase(application).planeDao();
-        LiveData<List<Plane>> roomLiveData = dao.getAllPlanes();
-
-        savedPlanes.addSource(roomLiveData, planes -> savedPlanes.setValue(planes));
+    public void savePlane(Plane plane) {
+        executorService.execute(() -> planeDao.insert(plane));
     }
 
-
-
+    public void deletePlane(Plane plane) {
+        executorService.execute(() -> planeDao.delete(plane));
+    }
 }

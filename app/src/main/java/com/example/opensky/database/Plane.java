@@ -6,16 +6,25 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Plane {
+
     @PrimaryKey
     @NonNull
-    public String icao24;
-    public String callsign;
+    protected String icao24;
 
-    public Plane(String icao24, String callsign) {
+    protected String callsign;
+    protected String originCountry;
+    protected float velocity;
+    protected float altitude;
+
+    public Plane(@NonNull String icao24, String callsign, String originCountry, float velocity, float altitude) {
         this.icao24 = icao24;
         this.callsign = callsign;
+        this.originCountry = originCountry;
+        this.velocity = velocity;
+        this.altitude = altitude;
     }
 
+    @NonNull
     public String getIcao24() {
         return icao24;
     }
@@ -24,11 +33,16 @@ public class Plane {
         return callsign;
     }
 
-    public void setIcao24(String icao24) {
-        this.icao24 = icao24;
+    public String getOriginCountry() {
+        return originCountry;
     }
 
-    public void setCallsign(String callsign) {
-        this.callsign = callsign;
+    public float getVelocity() {
+        return velocity;
     }
+
+    public float getAltitude() {
+        return altitude;
+    }
+
 }

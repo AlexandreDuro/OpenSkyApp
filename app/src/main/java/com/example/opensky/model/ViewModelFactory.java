@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
-    private Application mApplication;
+    private final Application mApplication;
 
     public ViewModelFactory(Application application) {
         mApplication = application;

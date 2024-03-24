@@ -1,7 +1,9 @@
 package com.example.opensky.apiclient.apiinterface;
 
-import java.util.List;
 import com.example.opensky.model.Location;
+
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
