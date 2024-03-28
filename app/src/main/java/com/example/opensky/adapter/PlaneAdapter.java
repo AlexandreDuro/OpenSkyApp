@@ -44,8 +44,8 @@ public class PlaneAdapter extends RecyclerView.Adapter<PlaneAdapter.PlaneViewHol
         holder.textViewIcao24.setText(currentItem.getIcao24());
         holder.textViewCallsign.setText(currentItem.getCallsign());
         holder.textViewOriginCountry.setText(currentItem.getOriginCountry());
-        holder.textViewVelocity.setText(String.valueOf(currentItem.getVelocity()));
-        holder.textViewAltitude.setText(String.valueOf(currentItem.getAltitude()));
+        holder.textViewVelocity.setText(String.valueOf(currentItem.getVelocity() + " m/s"));
+        holder.textViewAltitude.setText(String.valueOf(currentItem.getAltitude() + " m"));
     }
 
 

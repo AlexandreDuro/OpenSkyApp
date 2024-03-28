@@ -91,10 +91,10 @@ public class PlaneViewModel extends ViewModel {
                         List<Plane> planes = new ArrayList<>();
                         for (List<Object> state : states.getStates()) {
                             String icao24 = (String) state.get(0);
-                            String callsign = state.size() > 1 ? (String) state.get(1) : "";
-                            String originCountry = state.size() > 2 ? (String) state.get(2) : "";
-                            float velocity = state.size() > 9 ? ((Number) state.get(9)).floatValue() : 0;
-                            float altitude = state.size() > 13 ? ((Number) state.get(13)).floatValue() : 0;
+                            String callsign = state.size() > 1 && state.get(1) != null ? (String) state.get(1) : "N/A";
+                            String originCountry = state.size() > 2 && state.get(2) != null ? (String) state.get(2) : "N/A";
+                            float velocity = state.size() > 9 && state.get(9) != null ? ((Number) state.get(9)).floatValue() : 0;
+                            float altitude = state.size() > 13 && state.get(13) != null ? ((Number) state.get(13)).floatValue() : 0;
                             planes.add(new Plane(icao24, callsign.trim(), originCountry, velocity, altitude));
                             Log.d("PlaneViewModel", "loadPlanes: Plane added - ICAO24: " + icao24 + ", Callsign: " + callsign);
                         }
